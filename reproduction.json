@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "superbpe",
+  "title": "SuperBPE",
+  "paper": {
+    "title": "SuperBPE: Space Travel for Language Models",
+    "arxivId": "2503.13423",
+    "url": "https://arxiv.org/abs/2503.13423",
+    "authors": ["Alisa Liu", "Jonathan Hayase", "Valentin Hofmann", "Sewoong Oh", "Noah A. Smith", "Yejin Choi"],
+    "officialCodeUrl": "https://github.com/PythonNut/superbpe"
+  },
+  "status": "in-progress",
+  "priority": 1,
+  "repo": {
+    "name": "superbpe-reproduction",
+    "upstreamUrl": "https://github.com/vukrosic/llm-research-kit",
+    "githubUrl": null
+  },
+  "question": "Does SuperBPE's superword tokenization reproduce the encoding-efficiency gains at small scale on a Mac - SuperBPE encoding more bytes per token than BPE, BPE's efficiency plateauing while SuperBPE keeps rising with vocab size, and an interior-optimal transition point?",
+  "kitFit": "Tokenizer-only change: swap the tokenizer at the kit's setup_tokenizer() and re-measure bytes/token and (small-model) bits-per-byte in the same harness. The transition-point sweep is a clean VoidSpark autonomous-experiment target.",
+  "currentPhase": "tokenizer-reproduced",
+  "nextAction": "Tokenizer claims reproduced (C2/C3/C4/C6) and written up in REPRO_REPORT.md; 12-slide deck ready. Remaining (optional): the noisy small-model BPB sweep, and recording the video.",
+  "metrics": [
+    "bytes per token (encoding efficiency)",
+    "tokens per document",
+    "superword fraction of vocab",
+    "bits-per-byte (small model)",
+    "validation loss (small model)"
+  ],
+  "gpuBudget": {
+    "pricingNote": "This reproduction is tokenizer-level: the core claims need NO GPU. Tokenizer sweeps run on CPU; the optional small-model t-sweep runs locally on Apple MPS. Estimated cloud spend: $0.",
+    "stages": [
+      { "id": "tokenizer", "label": "Encoding-efficiency sweeps (BPE vs SuperBPE vs naive)", "gpu": "none (CPU)", "hours": 0, "hourlyRateUsd": 0, "estimatedCostUsd": 0, "gate": "BPE bytes/token plateaus with vocab while SuperBPE keeps rising; transition-point curve has an interior optimum." },
+      { "id": "small-model", "label": "Small-model t-sweep, matched training bytes", "gpu": "local Apple MPS", "hours": 0, "hourlyRateUsd": 0, "estimatedCostUsd": 0, "gate": "BPE and SuperBPE train stably to comparable bits-per-byte at matched compute (direction only; downstream out of scope at this scale)." }
+    ],
+    "plannedGpuHours": 0,
+    "plannedCostUsd": 0,
+    "stretchGpuHours": 0,
+    "stretchCostUsd": 0
+  },
+  "video": {
+    "status": "planned",
+    "workingTitle": "Tokenizers That Span Words: I Reproduced SuperBPE on a Laptop",
+    "definitionOfDone": "The video shows the two-phase superword mechanism, the from-scratch code, the reproduced encoding-efficiency curves (BPE plateau vs SuperBPE), the transition-point sweep, and an honest note that the 8B MMLU gain is out of scope at this scale."
+  },
+  "paths": {
+    "plan": "PLAN.md",
+    "results": "RESULTS.md",
+    "journal": "JOURNAL.md",
+    "video": "VIDEO.md",
+    "claims": "CLAIMS.md",
+    "assumptions": "ASSUMPTIONS.md"
+  }
+}

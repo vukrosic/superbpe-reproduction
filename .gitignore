@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Corpus data (regenerate with src/fetch_corpus.py)
+data/
+hf_cache/
+
+# Don't redistribute the paper PDF — it's on arXiv (see paper/README.md)
+paper/*.pdf
+
+# Kept and tracked: runs/*.png, runs/*.json, runs/*.md (the reproduced results), reproduction.json

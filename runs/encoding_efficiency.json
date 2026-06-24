@@ -1,0 +1,92 @@
+{
+  "vocab_sweep": [
+    {
+      "vocab": 1000,
+      "bpe": 2.6,
+      "bpe_supers": 0,
+      "superbpe": 2.648,
+      "superbpe_supers": 55
+    },
+    {
+      "vocab": 2000,
+      "bpe": 3.209,
+      "bpe_supers": 0,
+      "superbpe": 3.314,
+      "superbpe_supers": 140
+    },
+    {
+      "vocab": 4000,
+      "bpe": 3.849,
+      "bpe_supers": 0,
+      "superbpe": 4.077,
+      "superbpe_supers": 458
+    },
+    {
+      "vocab": 8000,
+      "bpe": 4.45,
+      "bpe_supers": 0,
+      "superbpe": 4.926,
+      "superbpe_supers": 1352
+    },
+    {
+      "vocab": 16000,
+      "bpe": 4.912,
+      "bpe_supers": 0,
+      "superbpe": 5.792,
+      "superbpe_supers": 3842
+    },
+    {
+      "vocab": 32000,
+      "bpe": 5.218,
+      "bpe_supers": 0,
+      "superbpe": 6.647,
+      "superbpe_supers": 10918,
+      "naive": 6.408,
+      "naive_supers": 22278
+    }
+  ],
+  "transition_sweep": [
+    {
+      "frac": 0.0,
+      "t": 256,
+      "bytes_per_token": 5.59,
+      "label": "naive(t=0)"
+    },
+    {
+      "frac": 0.1,
+      "t": 1600,
+      "bytes_per_token": 5.736,
+      "label": "t=0.1T"
+    },
+    {
+      "frac": 0.2,
+      "t": 3200,
+      "bytes_per_token": 5.768,
+      "label": "t=0.2T"
+    },
+    {
+      "frac": 0.4,
+      "t": 6400,
+      "bytes_per_token": 5.792,
+      "label": "t=0.4T"
+    },
+    {
+      "frac": 0.6,
+      "t": 9600,
+      "bytes_per_token": 5.795,
+      "label": "t=0.6T"
+    },
+    {
+      "frac": 0.8,
+      "t": 12800,
+      "bytes_per_token": 5.77,
+      "label": "t=0.8T"
+    },
+    {
+      "frac": 1.0,
+      "t": 16000,
+      "bytes_per_token": 4.912,
+      "label": "bpe(t=T)"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+train docs: 2691  heldout docs: 150
+
+=== M3: vocab sweep ===
+  V=  1000       bpe: 2.600 bytes/tok  supers=    0  (6.9s)
+  V=  1000  superbpe: 2.648 bytes/tok  supers=   55  (135.6s)
+  V=  2000       bpe: 3.209 bytes/tok  supers=    0  (7.0s)
+  V=  2000  superbpe: 3.314 bytes/tok  supers=  140  (103.2s)
+  V=  4000       bpe: 3.849 bytes/tok  supers=    0  (7.4s)
+  V=  4000  superbpe: 4.077 bytes/tok  supers=  458  (76.6s)
+  V=  8000       bpe: 4.450 bytes/tok  supers=    0  (8.0s)
+  V=  8000  superbpe: 4.926 bytes/tok  supers= 1352  (60.1s)
+  V= 16000       bpe: 4.912 bytes/tok  supers=    0  (8.5s)
+  V= 16000  superbpe: 5.792 bytes/tok  supers= 3842  (51.9s)
+  V= 32000       bpe: 5.218 bytes/tok  supers=    0  (9.0s)
+  V= 32000  superbpe: 6.647 bytes/tok  supers=10918  (50.2s)
+  V= 32000     naive: 6.408 bytes/tok  supers=22278  (486.9s)
+
+=== M4: transition-point sweep at vocab=16000 ===
+   naive(t=0) (t=   256): 5.590 bytes/tok  (449.4s)
+       t=0.1T (t=  1600): 5.736 bytes/tok  (129.5s)
+       t=0.2T (t=  3200): 5.768 bytes/tok  (79.2s)
+       t=0.4T (t=  6400): 5.792 bytes/tok  (49.1s)
+       t=0.6T (t=  9600): 5.795 bytes/tok  (38.5s)
+       t=0.8T (t= 12800): 5.770 bytes/tok  (31.9s)
+     bpe(t=T) (t= 16000): 4.912 bytes/tok  (8.3s)
+
+wrote /Users/vukrosic/my-life/research-repos/superbpe-reproduction/src/../runs/encoding_efficiency.json
