@@ -14,7 +14,7 @@
   "repo": {
     "name": "superbpe-reproduction",
     "upstreamUrl": "https://github.com/vukrosic/llm-research-kit",
-    "githubUrl": null
+    "githubUrl": "https://github.com/vukrosic/superbpe-reproduction"
   },
   "question": "Does SuperBPE's superword tokenization reproduce the encoding-efficiency gains at small scale on a Mac - SuperBPE encoding more bytes per token than BPE, BPE's efficiency plateauing while SuperBPE keeps rising with vocab size, and an interior-optimal transition point?",
   "kitFit": "Tokenizer-only change: swap the tokenizer at the kit's setup_tokenizer() and re-measure bytes/token and (small-model) bits-per-byte in the same harness. The transition-point sweep is a clean VoidSpark autonomous-experiment target.",
