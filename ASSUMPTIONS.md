@@ -5,8 +5,8 @@ on a Mac at small scale. Nothing here is filled silently — each is a logged ch
 
 ## A1 — Corpus (DIVERGENCE)
 Paper trains tokenizers on a 10 GB subset of OLMo2's pretraining corpus and evals bytes/token on a
-held-out split. **Choice:** use Vuk's existing data already on disk (`cosmopedia-v2` /
-`vukrosic/blueberry-1B-pretrain`), a few hundred MB, with a held-out split for the bytes/token eval.
+held-out split. **Choice:** use a small on-disk corpus (`cosmopedia-v2`, ~10 MB train + 1 MB
+held-out; regenerate with `src/fetch_corpus.py`) for the bytes/token eval.
 **Why:** zero download, already validated in the harness. **Effect:** absolute bytes/token numbers
 will differ from the paper; the *direction and shape* (C1–C6) should hold since they're properties
 of the algorithm, not the corpus. This is the main reason "done" = qualitative match, not number match.
@@ -53,12 +53,3 @@ runs; repeat key model comparisons over seeds 42/123/7 because small-scale BPB i
 ## A8 — Held-out split for bytes/token
 **Choice:** fixed held-out shard of the corpus not seen during tokenizer training; same shard across
 all tokenizers so the bytes/token comparison is apples-to-apples.
-
-## Open questions for Vuk before Phase 2
-1. **Model-run vocab `T`**: 8k or 16k for the small models? (8k = faster/cleaner separation from
-   embedding bloat; 16k = a bit more headroom for superwords to matter.) — A2.
-2. **How far to push C7/C8**: stop after the tokenizer claims (C1–C6, cheap and clean), or also
-   spend the few hours on the small-model BPB sweep knowing it'll be noisy? You said "tokenizer +
-   small model," so I'm planning both — confirm the small-model half is worth the noise.
-3. **Corpus**: is `blueberry-1B-pretrain` / `cosmopedia-v2` the right text, or do you want a
-   different domain for the bytes/token eval? — A1.

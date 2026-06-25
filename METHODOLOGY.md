@@ -1,8 +1,9 @@
-# PLAN.md — Phase 2 (decomposition & milestones)
+# METHODOLOGY — milestones & pass/fail gates
 
-Each milestone has a pass/fail check defined *before* implementation. Smallest scale first.
-Scope of this plan: the tokenizer-level claims (C1–C6). Model runs (C7–C8) get their own plan
-after we look at the curves.
+How this reproduction was structured: each milestone had a pass/fail check defined *before*
+implementation, smallest scale first. This is the build plan the work followed, kept as a record of
+methodology. For the per-claim results and verdicts, see [`REPRO_REPORT.md`](REPRO_REPORT.md).
+Scope: the tokenizer-level claims (C1–C6). Model runs (C7–C8) are out of scope at this scale.
 
 ## M1 — Two-phase BPE trainer (the core mechanism)
 **Build:** from-scratch byte-level BPE with a transition point `t`. Word boundaries encoded
@@ -34,9 +35,9 @@ sane range (~3–5 for English subword vocab). Same shard reused for every token
 qualitative result and the basis of our novel small-scale `t`-sweep ledger.
 
 ## M5 — Ledger + write-up
-Write `runs/encoding_efficiency.md` (table in llm-research-kit ledger style) + save plots.
-Update `CLAIMS.md` deltas for C1–C6 and `JOURNAL.md`. Decide with Vuk whether to proceed to model runs.
+Save the sweep tables + plots under `runs/` and record per-claim deltas for C1–C6 in
+[`REPRO_REPORT.md`](REPRO_REPORT.md).
 
-## Semantic-diff gate (per Phase 3 rule)
-Before declaring M1 correct, diff our merge logic against `PythonNut/superbpe` and log any divergence
-in `JOURNAL.md`. Reimplementation is allowed; silent divergence is not.
+## Semantic-diff gate
+Before declaring M1 correct, diff the merge logic against `PythonNut/superbpe` and log any divergence
+in [`REPRO_REPORT.md`](REPRO_REPORT.md). Reimplementation is allowed; silent divergence is not.

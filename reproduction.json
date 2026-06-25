@@ -44,10 +44,8 @@
     "definitionOfDone": "The video shows the two-phase superword mechanism, the from-scratch code, the reproduced encoding-efficiency curves (BPE plateau vs SuperBPE), the transition-point sweep, and an honest note that the 8B MMLU gain is out of scope at this scale."
   },
   "paths": {
-    "plan": "PLAN.md",
-    "results": "RESULTS.md",
-    "journal": "JOURNAL.md",
-    "video": "VIDEO.md",
+    "methodology": "METHODOLOGY.md",
+    "report": "REPRO_REPORT.md",
     "claims": "CLAIMS.md",
     "assumptions": "ASSUMPTIONS.md"
   }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>I Reproduced SuperBPE on a Laptop</title>
+<title>SuperBPE: Same Text, Fewer Tokens Than BPE</title>
 <style>
   :root{
     --bg:#0b0e14; --bg2:#11151f; --ink:#f1f5fb; --muted:#aebccd;
@@ -78,6 +78,8 @@
   .acc{color:var(--accent2); font-weight:700}
 
   code,.mono{font-family:var(--mono)}
+  a.link{color:var(--accent2); text-decoration:none; border-bottom:1px solid transparent; transition:border-color .15s, color .15s}
+  a.link:hover{color:#fff; border-bottom-color:currentColor}
   .codeblock{margin-top:16px; background:#080b11; border:1px solid var(--line); border-radius:12px; padding:16px 18px;
     font-family:var(--mono); font-size:clamp(12.5px,1.35vw,15.5px); color:var(--accent2); overflow-x:auto; max-width:64ch; line-height:1.7;
     white-space:pre; tab-size:2}
@@ -125,12 +127,20 @@
     <section class="slide">
       <div class="inner split">
         <div>
-          <span class="tag">Paper reproduction · from scratch</span>
-          <h1>I reproduced<br><span class="grad">SuperBPE</span><br>on a laptop. $0.</h1>
-          <p class="sub">A tokenizer whose tokens can span <em class="hl">across spaces</em>. The big paper trained it at 8B; I rebuilt the mechanism from scratch and reproduced its core result on a Mac CPU.</p>
+          <span class="tag">Tokenizer · benefit over BPE</span>
+          <h1><span class="grad">SuperBPE</span>:<br>same text,<br><span class="grad">fewer tokens</span></h1>
+          <p class="sub">Its tokens can span <em class="hl">across spaces</em> — so common phrases become single tokens. The gain over BPE <em class="hl">widens</em> with vocab: more text per context window, cheaper inference. Reproduced from scratch on a laptop, $0.</p>
           <div class="byline">
             <span>Paper: <b>Liu et al.</b> · SuperBPE, COLM 2025</span><span class="dot"></span>
             <span>reproduction walkthrough</span>
+          </div>
+          <div class="byline" style="margin-top:10px">
+            <a class="link mono" href="https://github.com/vukrosic/superbpe-reproduction" target="_blank" rel="noopener noreferrer">↗ github.com/vukrosic/superbpe-reproduction</a><span class="dot"></span>
+            <a class="link mono" href="https://arxiv.org/abs/2503.13423" target="_blank" rel="noopener noreferrer">↗ arXiv:2503.13423</a><span class="dot"></span>
+            <span>open source · from scratch · $0</span>
+          </div>
+          <div class="byline" style="margin-top:10px">
+            <span>Reproduce a paper yourself, then <a class="link" href="https://www.skool.com/become-ai-researcher-2669/about" target="_blank" rel="noopener noreferrer">post it in Become AI Researcher</a> — learn AI research with others doing the same.</span>
           </div>
         </div>
         <div class="art-wrap">
@@ -174,9 +184,9 @@
       <div class="inner">
         <div class="num"><span class="pill">01</span><span class="lbl">The one weird rule</span></div>
         <h2>Every tokenizer refuses to<br>merge across a space</h2>
-        <p class="sub">BPE learns merges greedily — <code>t</code>+<code>h</code> → <code>th</code>, <code>th</code>+<code>e</code> → <code>the</code> — but a hard pretokenization step splits text on whitespace first, so a merge can <em class="hl">never</em> cross a space.</p>
-        <blockquote class="kick">Tokens are always <span class="grad">subwords</span>. "New York", "by the way", "of course" — each is forced into multiple tokens, forever.</blockquote>
-        <p class="sub" style="margin-top:16px">Reasonable in 2016. But is whitespace really the boundary of meaning?</p>
+        <p class="sub">It's not BPE itself — a <em class="hl">pretokenization</em> step runs first and chops text on whitespace. BPE then merges <em class="hl">inside</em> each chunk only, so a merge can <em class="hl">never</em> cross a space.</p>
+        <blockquote class="kick">Tokens are always <span class="grad">subwords</span>. "New York", "by the way", "of course" — forced into multiple tokens, forever.</blockquote>
+        <div class="card warn" style="max-width:none"><b>Why the rule was added</b><p>Without it, greedy BPE glues the most frequent cross-word junk first — <code>"e▁"</code>, <code>"▁the"</code>, <code>", "</code> — wasting vocab on garbage. The whitespace split is a guardrail against greedy mistakes. Reasonable in 2016; too strict today.</p></div>
       </div>
     </section>
 
@@ -251,8 +261,8 @@
             <tr><td><span class="acc">0 &lt; t &lt; T</span></td><td>subwords <span class="grad">then</span> superwords → <b>SuperBPE</b></td><td><span class="acc">best</span> — interior optimum</td></tr>
           </tbody>
         </table>
-        <p class="sub" style="margin-top:16px">The paper finds the sweet spot is an <em class="hl">interior</em> value (their best is around <code>t ≈ 80k</code> of a 200k vocab). Learn the alphabet of words before gluing them together.</p>
-        <div class="card good" style="max-width:none"><b>My sweep confirms it — vocab 16k</b><p>naive (t=0): <b>5.59</b> &nbsp;·&nbsp; t=0.6T: <span class="acc">5.80 (best)</span> &nbsp;·&nbsp; pure BPE (t=T): <b>4.91</b> bytes/token. Smooth curve, interior optimum — both extremes worse.</p></div>
+        <p class="sub" style="margin-top:16px">The paper's main model uses an <em class="hl">interior</em> transition point — <code>t = 180k</code> of a 200k vocab. Learn the alphabet of words first, then glue them into phrases.</p>
+        <div class="card good" style="max-width:none"><b>My sweep confirms it — vocab 16k</b><p>naive (t=0): <b>5.59</b> &nbsp;·&nbsp; t=0.6T: <span class="acc">5.79 (best)</span> &nbsp;·&nbsp; pure BPE (t=T): <b>4.91</b> bytes/token. Smooth curve, interior optimum — both extremes worse.</p></div>
       </div>
     </section>
 
@@ -280,24 +290,32 @@ train_bpe(units, upto=T)</div>
       </div>
     </section>
 
-    <!-- 07 PROOF TABLE -->
+    <!-- 07 PROOF TABLE + PAPER FIGURE -->
     <section class="slide">
       <div class="inner">
         <div class="num"><span class="pill">06</span><span class="lbl">Does it reproduce?</span></div>
-        <h2>Encoding efficiency, measured</h2>
-        <p class="sub" style="margin-bottom:10px">My from-scratch tokenizers, 10 MB of text, held-out shard. Bytes-per-token — higher is better.</p>
-        <table>
-          <thead><tr><th class="num-c">vocab</th><th class="num-c">BPE</th><th class="num-c">SuperBPE</th><th class="num-c">gap</th><th class="num-c">superwords</th></tr></thead>
-          <tbody>
-            <tr><td class="num-c">1k</td><td class="num-c">2.60</td><td class="num-c">2.65</td><td class="num-c">+0.05</td><td class="num-c">55</td></tr>
-            <tr><td class="num-c">2k</td><td class="num-c">3.21</td><td class="num-c">3.31</td><td class="num-c">+0.11</td><td class="num-c">140</td></tr>
-            <tr><td class="num-c">4k</td><td class="num-c">3.85</td><td class="num-c">4.08</td><td class="num-c">+0.23</td><td class="num-c">458</td></tr>
-            <tr><td class="num-c">8k</td><td class="num-c">4.45</td><td class="num-c">4.93</td><td class="num-c">+0.48</td><td class="num-c">1,352</td></tr>
-            <tr><td class="num-c">16k</td><td class="num-c">4.91</td><td class="num-c">5.79</td><td class="num-c">+0.88</td><td class="num-c">3,842</td></tr>
-            <tr><td class="num-c">32k</td><td class="num-c">5.22</td><td class="num-c acc">6.65</td><td class="num-c acc">+1.43</td><td class="num-c">10,918</td></tr>
-          </tbody>
-        </table>
-        <blockquote class="kick" style="margin-top:18px">The gap doesn't close — it <span class="grad">widens</span>. +0.05 → +1.43 bytes/token.</blockquote>
+        <h2>My numbers vs the paper's figure</h2>
+        <div class="split" style="align-items:start; margin-top:8px">
+          <div>
+            <p class="sub" style="margin:0 0 10px; max-width:none">From-scratch tokenizers · 10 MB · held-out shard. Bytes/token, higher is better.</p>
+            <table>
+              <thead><tr><th class="num-c">vocab</th><th class="num-c">BPE</th><th class="num-c">SuperBPE</th><th class="num-c">gap</th></tr></thead>
+              <tbody>
+                <tr><td class="num-c">1k</td><td class="num-c">2.60</td><td class="num-c">2.65</td><td class="num-c">+0.05</td></tr>
+                <tr><td class="num-c">2k</td><td class="num-c">3.21</td><td class="num-c">3.31</td><td class="num-c">+0.11</td></tr>
+                <tr><td class="num-c">4k</td><td class="num-c">3.85</td><td class="num-c">4.08</td><td class="num-c">+0.23</td></tr>
+                <tr><td class="num-c">8k</td><td class="num-c">4.45</td><td class="num-c">4.93</td><td class="num-c">+0.48</td></tr>
+                <tr><td class="num-c">16k</td><td class="num-c">4.91</td><td class="num-c">5.79</td><td class="num-c">+0.88</td></tr>
+                <tr><td class="num-c">32k</td><td class="num-c">5.22</td><td class="num-c acc">6.65</td><td class="num-c acc">+1.43</td></tr>
+              </tbody>
+            </table>
+            <blockquote class="kick" style="margin-top:16px">The gap doesn't close — it <span class="grad">widens</span>. +0.05 → +1.43.</blockquote>
+          </div>
+          <div class="art-wrap">
+            <img src="paper/figure1_superbpe.png" alt="SuperBPE paper Figure 1: bytes per token vs vocabulary size" style="width:100%; border-radius:12px; border:1px solid var(--line); background:#fff; padding:10px"/>
+            <div class="cap">Paper Fig 1 (Liu et al.) · 200k vocab, OLMo2 mix — same curve, larger scale: BPE flattens, SuperBPE keeps climbing.</div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -363,17 +381,72 @@ train_bpe(units, upto=T)</div>
           <li><span class="k">▶</span><span><b>BPE plateaus</b> because it exhausts the useful whole-words and starts adding rare junk subwords.<span class="d">Bounded above by the average word length of the text.</span></span></li>
           <li><span class="k">▶</span><span><b>SuperBPE keeps winning</b> by treating common word <em>sequences</em> as single units — there are far more of those to find.</span></li>
         </ul>
+        <div class="card warn" style="max-width:none; margin-top:20px"><b>But fewer tokens cuts both ways</b><p>A transformer spends fixed compute <b>per token</b>. Packing more text into each token also means <b>less compute per word</b> — which is exactly why some frontier tokenizers bet the <em>opposite</em> way. ↓</p></div>
       </div>
     </section>
 
-    <!-- 10 LIMITS -->
+    <!-- 10 TWO OPPOSITE BETS -->
     <section class="slide">
       <div class="inner">
-        <div class="num"><span class="pill">09</span><span class="lbl">Honest limits</span></div>
+        <div class="num"><span class="pill">09</span><span class="lbl">The other direction</span></div>
+        <h2>Two opposite bets on the same dial</h2>
+        <p class="sub" style="max-width:none; margin-bottom:6px">Tokenization secretly sets <em class="hl">how much compute the model spends per unit of text</em>. You can trade either way:</p>
+        <div class="split" style="align-items:stretch; margin-top:8px">
+          <div class="card good"><b>SuperBPE → fewer tokens</b>
+            <p style="margin-top:8px"><b style="color:var(--accent2)">✓</b> more text per context window<br>
+            <b style="color:var(--accent2)">✓</b> cheaper inference · longer memory<br>
+            <b style="color:var(--bad)">✗</b> less compute per word<br>
+            <b style="color:var(--bad)">✗</b> blurs exact symbols (digits, code)</p>
+          </div>
+          <div class="card warn"><b>Finer tokenizer → more tokens</b>
+            <p style="margin-top:8px"><b style="color:var(--accent2)">✓</b> more compute per character<br>
+            <b style="color:var(--accent2)">✓</b> sharper instructions · tools · math<br>
+            <b style="color:var(--bad)">✗</b> burns more tokens for same text<br>
+            <b style="color:var(--bad)">✗</b> pricier · less effective context</p>
+          </div>
+        </div>
+        <div class="card" style="max-width:none; border-left-color:var(--accent)"><b>Real example — Claude Opus 4.7</b><p>Anthropic's first tokenizer change went the <b>more-tokens</b> way: measured at <b>~1.25–1.47×</b> the token count of 4.6 (code hit hardest). Smaller tokens force attention over individual words — tied to tighter instruction-following and character/tool precision. The cost: every prompt is more tokens. <span style="color:var(--muted)">(Shipped alongside new weights — not a clean isolation.)</span></p></div>
+      </div>
+    </section>
+
+    <!-- 11 SWAPPING THE TOKENIZER -->
+    <section class="slide">
+      <div class="inner split">
+        <div>
+          <div class="num"><span class="pill">10</span><span class="lbl">How do you even switch?</span></div>
+          <h2>Changing the tokenizer of an <span class="grad">already-trained</span> model</h2>
+          <p class="sub">You can't just swap it in. The embedding table is keyed to the <em class="hl">old</em> token IDs — new tokens point at rows that mean nothing, and a naive swap wrecks the model.</p>
+          <div class="card good"><b>The fix is two steps</b><p><b>1. Smart init —</b> build each new token's embedding from the old ones it overlaps (mean-init → WECHSEL / FOCUS / ZeTT / OMP "token surgery"), never random.<br><b>2. Heal —</b> a short continued-pretraining run on plain text. Loss dips at the swap, then catches up and edges past the old tokenizer.</p></div>
+        </div>
+        <div class="art-wrap">
+          <svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Quality dips at tokenizer swap then recovers above the old tokenizer">
+            <line x1="52" y1="40" x2="52" y2="248" stroke="#33415a" stroke-width="1.5"/>
+            <line x1="52" y1="248" x2="430" y2="248" stroke="#33415a" stroke-width="1.5"/>
+            <text x="22" y="150" fill="#aebccd" font-size="11" font-family="ui-monospace,Menlo,monospace" transform="rotate(-90 22 150)">quality →</text>
+            <text x="245" y="274" text-anchor="middle" fill="#aebccd" font-size="11" font-family="ui-monospace,Menlo,monospace">continued pretraining →</text>
+            <line x1="52" y1="120" x2="430" y2="120" stroke="#8aa0ff" stroke-width="1.6" stroke-dasharray="5 5"/>
+            <text x="428" y="112" text-anchor="end" fill="#8aa0ff" font-size="11" font-family="ui-monospace,Menlo,monospace">old tokenizer</text>
+            <line x1="150" y1="58" x2="150" y2="248" stroke="#ffbf66" stroke-width="2" stroke-dasharray="4 4"/>
+            <text x="150" y="50" text-anchor="middle" fill="#ffbf66" font-size="11" font-weight="700" font-family="ui-monospace,Menlo,monospace">swap</text>
+            <path d="M150,120 L161,212 C205,205 235,150 295,128 C345,110 395,99 430,94" fill="none" stroke="#5cebc6" stroke-width="2.6" stroke-linejoin="round"/>
+            <circle cx="161" cy="212" r="3.8" fill="#ff7a7a"/>
+            <text x="174" y="216" fill="#ff7a7a" font-size="10.5" font-family="ui-monospace,Menlo,monospace">naive init = crash</text>
+            <circle cx="430" cy="94" r="3.8" fill="#5cebc6"/>
+            <text x="424" y="86" text-anchor="end" fill="#5cebc6" font-size="10.5" font-family="ui-monospace,Menlo,monospace">recovers, then wins</text>
+          </svg>
+          <div class="cap">transplant the vocab, then let it settle</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 LIMITS -->
+    <section class="slide">
+      <div class="inner">
+        <div class="num"><span class="pill">11</span><span class="lbl">Honest limits</span></div>
         <h2>What I did <span class="grad">not</span> reproduce</h2>
         <div class="split" style="align-items:stretch; margin-top:8px">
           <div class="card good"><b>✓ Reproduced</b><p>The encoding-efficiency mechanism: SuperBPE beats BPE, BPE plateaus, the gap widens with vocab. On a laptop, $0.</p></div>
-          <div class="card bad"><b>✗ Not attempted</b><p>The headline <b>+8.2% MMLU</b> at 8B params. At ~1M params downstream accuracy is pure noise — the paper says so too. Claiming it here would be dishonest.</p></div>
+          <div class="card bad"><b>✗ Not attempted</b><p>The paper's 8B / 200k / t=180k headline: <b>+4.0% avg</b> across 30 tasks (<b>+8.2% MMLU</b>) and <b>27% less inference compute</b>. At ~1M params downstream accuracy is pure noise — the paper says so too. Claiming it here would be dishonest.</p></div>
         </div>
         <div class="card warn" style="max-width:none"><b>Different corpus &amp; vocab</b><p>My absolute bytes/token differ from the paper's (10 GB OLMo2 mix, 200k vocab). I reproduce the <b>shape and direction</b>, not the exact numbers — that's what's reproducible at this scale.</p></div>
       </div>
@@ -382,7 +455,7 @@ train_bpe(units, upto=T)</div>
     <!-- 11 HOW CHEAP -->
     <section class="slide">
       <div class="inner">
-        <div class="num"><span class="pill">10</span><span class="lbl">The point</span></div>
+        <div class="num"><span class="pill">12</span><span class="lbl">The point</span></div>
         <h2>Frontier-relevant work,<br>zero compute</h2>
         <p class="sub">The whole result is tokenizer-level. No GPU, no cloud, no training run — a from-scratch reimplementation and a CPU sweep reproduce the core claim of a COLM 2025 paper.</p>
         <div class="chain" style="margin-top:18px; color:var(--ink)">
@@ -404,7 +477,7 @@ train_bpe(units, upto=T)</div>
         <ul class="list" style="margin-top:18px">
           <li><span class="k">↗</span><span><b>Paper</b><span class="d">arXiv:2503.13423 · superbpe.github.io</span></span></li>
           <li><span class="k">↗</span><span><b>Official code</b><span class="d">github.com/PythonNut/superbpe</span></span></li>
-          <li><span class="k">▤</span><span><b>This reproduction</b><span class="d">research-repos/superbpe-reproduction · from-scratch BPE + sweep</span></span></li>
+          <li><span class="k">▤</span><span><b>This reproduction</b><span class="d">github.com/vukrosic/superbpe-reproduction · from-scratch BPE + sweep</span></span></li>
         </ul>
       </div>
     </section>

@@ -20,7 +20,7 @@ Verdict key: ✅ reproduced (shape/direction) · 🟡 partial · ⬜ not attempt
 
 ## What it took
 - One real bug, caught by the M1 toy gate: the phase-2 entry guard fired for pure BPE when phase 1
-  exhausted its within-word pairs early. Fixed to gate on `t < vocab_size`. (`JOURNAL.md`)
+  exhausted its within-word pairs early. Fixed to gate on `t < vocab_size`.
 - Three correctness-preserving speedups to make 32k-vocab tractable in pure Python: per-word
   re-encode cache at the phase transition, all-occurrences-per-rank encoder, lazy-deletion max-heap
   for best-pair selection, and a chunked bytes/token eval.
